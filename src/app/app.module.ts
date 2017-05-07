@@ -1,21 +1,23 @@
-import {NgModule, ErrorHandler} from '@angular/core';
-import {BrowserModule} from '@angular/platform-browser';
-import {IonicApp, IonicModule, IonicErrorHandler} from 'ionic-angular';
-import {MyApp} from './app.component';
+import {ErrorHandler, NgModule} from "@angular/core";
+import {BrowserModule} from "@angular/platform-browser";
+import {IonicApp, IonicErrorHandler, IonicModule} from "ionic-angular";
+import {MyApp} from "./app.component";
 
-import {AboutPage} from '../pages/about/about';
-import {ContactPage} from '../pages/contact/contact';
-import {HomePage} from '../pages/home/home';
-import {TabsPage} from '../pages/tabs/tabs';
+import {WorkTimesPage} from "../pages/worktimes/worktimes";
+import {WorkingHoursPage} from "../pages/workinghours/workinghours";
+import {TabsPage} from "../pages/tabs/tabs";
 
-import {StatusBar} from '@ionic-native/status-bar';
-import {SplashScreen} from '@ionic-native/splash-screen';
+import {StatusBar} from "@ionic-native/status-bar";
+import {SplashScreen} from "@ionic-native/splash-screen";
 import {Ndef, NFC} from "@ionic-native/nfc";
 import {Vibration} from "@ionic-native/vibration";
-import {AngularFireModule} from 'angularfire2';
-import {AngularFireAuthModule} from 'angularfire2/auth';
-import {LoginPage} from '../pages/login/login';
-import {FirebaseService} from '../providers/firebase-service';
+import {AngularFireModule} from "angularfire2";
+import {AngularFireAuthModule} from "angularfire2/auth";
+import {AngularFireDatabaseModule} from "angularfire2/database";
+import {LoginPage} from "../pages/login/login";
+import {FirebaseService} from "../providers/firebase-service";
+import {HelperService} from "../providers/helper-service";
+import {GooglePlus} from "@ionic-native/google-plus";
 
 export const firebaseConfig = {
   apiKey: "AIzaSyArPv8jzIq2Y8QzY3_RN_k7LS95_MZaNjw",
@@ -29,9 +31,8 @@ export const firebaseConfig = {
 @NgModule({
   declarations: [
     MyApp,
-    AboutPage,
-    ContactPage,
-    HomePage,
+    WorkTimesPage,
+    WorkingHoursPage,
     TabsPage,
     LoginPage
   ],
@@ -39,14 +40,14 @@ export const firebaseConfig = {
     BrowserModule,
     IonicModule.forRoot(MyApp),
     AngularFireModule.initializeApp(firebaseConfig),
-    AngularFireAuthModule
+    AngularFireAuthModule,
+    AngularFireDatabaseModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
     MyApp,
-    AboutPage,
-    ContactPage,
-    HomePage,
+    WorkTimesPage,
+    WorkingHoursPage,
     TabsPage,
     LoginPage
   ],
@@ -57,7 +58,9 @@ export const firebaseConfig = {
     NFC,
     Vibration,
     Ndef,
-    FirebaseService
+    FirebaseService,
+    HelperService,
+    GooglePlus
   ]
 })
 export class AppModule {

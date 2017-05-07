@@ -1,3 +1,36 @@
 page-login {
+  .col {
+    //border: 1px dashed #222222;
+    padding: 0 !important;
+  }
 
+  .auth_img {
+    width: 50% !important;
+    display: inline-block;
+    max-height: 40%;
+  }
+
+  button {
+    height: 60px !important;
+  }
+
+  /* I know it's bad practice to use !important but nothing else was working and I haven't used MDL before so I assume it's an MDL thing... */
+  .mdl-icon-btn-google {
+    /* Pad the text to prevent it from covering up the icon */
+    padding-left: 45px !important;
+    /* Stop the background from tiling */
+    background-repeat: no-repeat !important;
+    /* Now make the background completely contained in the element (so it is 100% height) */
+    background-size: 24px !important;
+    /* Make the background start at 5px from the left (I just think it looks better, you can remove it and play around with it) */
+    background-position: 5px !important;
+    /* Finally, set the background image - this is the image you want for the icon - in this case, an 'f' */
+    background-image: url("../assets/img/google.svg") !important;
+
+    background: white;
+
+    color: #222222;
+
+    box-shadow: 0 2px 2px 0 rgba(0, 0, 0, .14), 0 3px 1px -2px rgba(0, 0, 0, .2), 0 1px 5px 0 rgba(0, 0, 0, .12);
+  }
 }

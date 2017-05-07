@@ -1,13 +1,13 @@
 {
   "android": {
     "debug": {
-      "keystore": "keystores/debug.keystore.jks",
+      "keystore": "keystores/debug.keystore",
       "storePassword": "0102aragorn!",
       "alias": "android_debug",
       "password" : "0102aragorn!"
     },
     "release": {
-      "keystore": "keystores/release.keystore.jks",
+      "keystore": "keystores/release.keystore",
       "storePassword": "0102aragorn!",
       "alias": "android_release",
       "password" : "0102aragorn!"

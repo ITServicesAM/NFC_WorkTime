@@ -1,10 +1,11 @@
-import {Component} from '@angular/core';
-import {Platform} from 'ionic-angular';
-import {StatusBar} from '@ionic-native/status-bar';
-import {SplashScreen} from '@ionic-native/splash-screen';
+import {Component} from "@angular/core";
+import {Platform} from "ionic-angular";
+import {StatusBar} from "@ionic-native/status-bar";
+import {SplashScreen} from "@ionic-native/splash-screen";
 
-import {TabsPage} from '../pages/tabs/tabs';
-import {FirebaseService} from '../providers/firebase-service';
+import {TabsPage} from "../pages/tabs/tabs";
+import {FirebaseService} from "../providers/firebase-service";
+import {LoginPage} from "../pages/login/login";
 
 @Component({
   templateUrl: 'app.html'
@@ -23,6 +24,12 @@ export class MyApp {
       splashScreen.hide();
     });
 
-
+    this.firebaseService.isAuthenticated().subscribe(user => {
+      if (user === null) {
+        this.rootPage = LoginPage;
+      } else {
+        this.rootPage = TabsPage;
+      }
+    });
   }
 }

@@ -1,0 +1,44 @@
+<ion-header>
+  <ion-navbar>
+    <ion-title>
+      Meine Arbeitszeiten
+    </ion-title>
+    <ion-buttons right>
+      <button ion-button icon-only (click)="signOut()">
+        <ion-icon name="log-out"></ion-icon>
+      </button>
+    </ion-buttons>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+
+  <ion-list>
+    <ion-card
+      *ngFor="let workTime of workTimesObservable | async">
+      <ion-card-content>
+        <!-- Add card content here! -->
+        <ion-card-title>
+          Datum: {{workTime.Kommtzeit | date:'dd.MM.yyyy'}}
+        </ion-card-title>
+        <div>Kommtzeit: {{workTime.Kommtzeit | date:'HH:mm:ss'}} Uhr</div>
+        <div>Gehtzeit: {{workTime.Gehtzeit | date:'HH:mm:ss'}} Uhr</div>
+      </ion-card-content>
+      <ion-row>
+        <ion-col>
+          <button ion-button icon-left clear small>
+            <ion-icon name="create"></ion-icon>
+            <div>Bearbeiten</div>
+          </button>
+        </ion-col>
+        <ion-col>
+          <button ion-button icon-left clear small>
+            <ion-icon name="trash"></ion-icon>
+            <div>Löschen</div>
+          </button>
+        </ion-col>
+      </ion-row>
+    </ion-card>
+  </ion-list>
+
+</ion-content>
