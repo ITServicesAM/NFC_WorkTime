@@ -1,3 +1,6 @@
 page-about {
-
+  button[fab].myfab {
+    top: calc(100% - 35px)!important;
+    z-index: 50;
+  }
 }

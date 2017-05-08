@@ -2,6 +2,9 @@
   <ion-navbar>
     <ion-title>Mein Arbeitszeitkonto</ion-title>
     <ion-buttons right>
+      <button ion-button icon-only (click)="addWorkTimeManually()">
+        <ion-icon name="add"></ion-icon>
+      </button>
       <button ion-button icon-only (click)="signOut()">
         <ion-icon name="log-out"></ion-icon>
       </button>
@@ -12,39 +15,48 @@
 <ion-content full-screen padding>
 
   <div class="vertical-align-content">
-    <!--Centered Container-->
-    <ion-row text-center>
-      <ion-card>
-        <ion-card-content>
-          <!-- Add card content here! -->
-          <ion-card-title>
-            Datum: {{todayDate}}
-          </ion-card-title>
-          <div *ngIf="startWorkTime !== '-'">Kommtzeit: {{startWorkTime | date:'HH:mm:ss'}} Uhr</div>
-          <div *ngIf="startWorkTime === '-'">Kommtzeit: - Uhr</div>
-          <div *ngIf="endWorkTime !== '-'">Gehtzeit: {{endWorkTime | date:'HH:mm:ss'}} Uhr</div>
-          <div *ngIf="endWorkTime === '-'">Gehtzeit: - Uhr</div>
-          <div
-            *ngIf="todayWorkingHours">
-            Heutige Arbeitszeit: {{todayWorkingHours}}
-          </div>
-        </ion-card-content>
-      </ion-card>
 
-      <ion-card text-center>
-        <ion-card-content>
-          <!-- Add card content here! -->
-          <ion-card-title>
-            Arbeitszeitkonto
-          </ion-card-title>
-          <h1>{{overallWorkingHours}}</h1>
-          <h3>Stunden</h3>
-        </ion-card-content>
-        <button ion-button icon-left clear (click)="editWorkingHoursManually()">
-          <ion-icon name="create"></ion-icon>
-          Bearbeiten
-        </button>
-      </ion-card>
-    </ion-row>
+    <ion-grid text-center>
+      <ion-row>
+        <ion-col></ion-col>
+        <ion-col col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4>
+          <ion-card>
+            <ion-card-content>
+              <!-- Add card content here! -->
+              <ion-card-title>
+                Datum: {{todayDate}}
+              </ion-card-title>
+              <div
+                [@fadeIn]>
+                Kommtzeit: {{workTimeStart}} Uhr
+              </div>
+              <div
+                [@fadeIn]>Gehtzeit: {{workTimeEnd}} Uhr
+              </div>
+              <div
+                [@fadeIn]>
+                Heutige Arbeitszeit: {{(workTimeObservable | async)?.workingHours}}
+              </div>
+            </ion-card-content>
+          </ion-card>
+
+          <ion-card text-center>
+            <ion-card-content>
+              <!-- Add card content here! -->
+              <ion-card-title>
+                Arbeitszeitkonto
+              </ion-card-title>
+              <h1>{{overallWorkingHours}}</h1>
+              <h3>Stunden</h3>
+            </ion-card-content>
+            <button ion-button icon-left clear (click)="editWorkingHoursManually()">
+              <ion-icon name="create"></ion-icon>
+              Bearbeiten
+            </button>
+          </ion-card>
+        </ion-col>
+        <ion-col></ion-col>
+      </ion-row>
+    </ion-grid>
   </div>
 </ion-content>

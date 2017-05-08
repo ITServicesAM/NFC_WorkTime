@@ -18,6 +18,9 @@ import {LoginPage} from "../pages/login/login";
 import {FirebaseService} from "../providers/firebase-service";
 import {HelperService} from "../providers/helper-service";
 import {GooglePlus} from "@ionic-native/google-plus";
+import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
+import {SuperTabsModule} from 'ionic2-super-tabs';
+import {AddWorkTimeModal} from '../pages/workinghours/add_work_time_modal';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyArPv8jzIq2Y8QzY3_RN_k7LS95_MZaNjw",
@@ -34,11 +37,14 @@ export const firebaseConfig = {
     WorkTimesPage,
     WorkingHoursPage,
     TabsPage,
-    LoginPage
+    LoginPage,
+    AddWorkTimeModal
   ],
   imports: [
     BrowserModule,
+    BrowserAnimationsModule,
     IonicModule.forRoot(MyApp),
+    SuperTabsModule.forRoot(),
     AngularFireModule.initializeApp(firebaseConfig),
     AngularFireAuthModule,
     AngularFireDatabaseModule
@@ -49,7 +55,8 @@ export const firebaseConfig = {
     WorkTimesPage,
     WorkingHoursPage,
     TabsPage,
-    LoginPage
+    LoginPage,
+    AddWorkTimeModal
   ],
   providers: [
     StatusBar,

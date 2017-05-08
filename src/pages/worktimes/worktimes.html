@@ -13,32 +13,56 @@
 
 <ion-content padding>
 
-  <ion-list>
-    <ion-card
-      *ngFor="let workTime of workTimesObservable | async">
-      <ion-card-content>
-        <!-- Add card content here! -->
-        <ion-card-title>
-          Datum: {{workTime.Kommtzeit | date:'dd.MM.yyyy'}}
-        </ion-card-title>
-        <div>Kommtzeit: {{workTime.Kommtzeit | date:'HH:mm:ss'}} Uhr</div>
-        <div>Gehtzeit: {{workTime.Gehtzeit | date:'HH:mm:ss'}} Uhr</div>
-      </ion-card-content>
-      <ion-row>
-        <ion-col>
-          <button ion-button icon-left clear small>
-            <ion-icon name="create"></ion-icon>
-            <div>Bearbeiten</div>
-          </button>
-        </ion-col>
-        <ion-col>
-          <button ion-button icon-left clear small>
-            <ion-icon name="trash"></ion-icon>
-            <div>Löschen</div>
-          </button>
-        </ion-col>
-      </ion-row>
-    </ion-card>
-  </ion-list>
+  <ion-grid>
+    <ion-row>
+      <ion-col></ion-col>
+      <ion-col col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4>
+        <ion-list>
+          <ion-card
+            *ngFor="let workTime of workTimes">
+
+            <ion-card-content>
+              <!-- Add card content here! -->
+              <div style="position: relative">
+                <ion-fab right top>
+                  <button ion-fab class="myfab" (click)="deleteWorkTime(workTime)">
+                    <ion-icon name="trash"></ion-icon>
+                  </button>
+                </ion-fab>
+              </div>
+
+              <ion-card-title>
+                Datum: {{workTime.getKommtzeit() | date:'dd.MM.yyyy'}}
+              </ion-card-title>
+
+              <ion-item>
+                <span item-left>Kommtzeit: </span>
+                <ion-datetime
+                  (ionChange)="kommtZeitChanged($event, workTime)"
+                  displayFormat="HH:mm:ss"
+                  pickerFormat="HH:mm:ss"
+                  [ngModel]="workTime.workTimeStart"></ion-datetime>
+              </ion-item>
+
+              <ion-item>
+                <span item-left>Gehtzeit: </span>
+                <ion-datetime
+                  (ionChange)="gehtZeitChanged($event, workTime)"
+                  displayFormat="HH:mm:ss"
+                  pickerFormat="HH:mm:ss"
+                  [ngModel]="workTime.workTimeEnd"></ion-datetime>
+                <span> Uhr</span>
+              </ion-item>
+              <div
+                *ngIf="workTime.getWorkingHours()">
+                Heutige Arbeitszeit: {{workTime.getWorkingHours()}}
+              </div>
+            </ion-card-content>
+          </ion-card>
+        </ion-list>
+      </ion-col>
+      <ion-col></ion-col>
+    </ion-row>
+  </ion-grid>
 
 </ion-content>

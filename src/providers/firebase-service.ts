@@ -1,13 +1,13 @@
-import {Injectable} from "@angular/core";
-import "rxjs/add/operator/map";
-import {AngularFireAuth} from "angularfire2/auth";
-import {AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable} from "angularfire2/database";
-import * as firebase from "firebase/app";
-import {Observable} from "rxjs/Observable";
-import {Platform} from "ionic-angular";
-import {GooglePlus} from "@ionic-native/google-plus";
-import {HelperService} from "./helper-service";
-import {WorkTime} from "../models/worktime";
+import {Injectable} from '@angular/core';
+import 'rxjs/add/operator/map';
+import {AngularFireAuth} from 'angularfire2/auth';
+import {AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable} from 'angularfire2/database';
+import * as firebase from 'firebase/app';
+import {Observable} from 'rxjs/Observable';
+import {Platform} from 'ionic-angular';
+import {GooglePlus} from '@ionic-native/google-plus';
+import {HelperService} from './helper-service';
+import * as moment from'moment';
 
 @Injectable()
 export class FirebaseService {
@@ -48,20 +48,26 @@ export class FirebaseService {
     this.afAuth.auth.signOut();
   }
 
-  saveStartWorkTime(startWorkTime: string): firebase.Promise<any> {
-    return this.afDB.object("arbeitszeiten/" + this.getDBDateString() + "/Kommtzeit").set(startWorkTime);
+  saveStartWorkTime(date: string, startWorkTime: string): firebase.Promise<any> {
+    // console.log(moment(date).format());
+    this.afDB.object("arbeitszeiten/" + date + "/ReverseOrderDate").set((0 - moment(date).valueOf()));
+    return this.afDB.object("arbeitszeiten/" + date + "/workTimeStart").set(startWorkTime);
   }
 
-  getStartWorkTime(): FirebaseObjectObservable<any> {
-    return this.afDB.object("arbeitszeiten/" + this.getDBDateString() + "/Kommtzeit");
+  getWorkTime(dateKey: string) {
+    return this.afDB.object("arbeitszeiten/" + dateKey);
   }
 
-  saveEndWorkTime(endWorkTime: string): firebase.Promise<any> {
-    return this.afDB.object("arbeitszeiten/" + this.getDBDateString() + "/Gehtzeit").set(endWorkTime);
+  getStartWorkTime(date: string): FirebaseObjectObservable<any> {
+    return this.afDB.object("arbeitszeiten/" + date + "/workTimeStart");
   }
 
-  getEndWorkTime(): FirebaseObjectObservable<any> {
-    return this.afDB.object("arbeitszeiten/" + this.getDBDateString() + "/Gehtzeit");
+  saveEndWorkTime(date: string, endWorkTime: string): firebase.Promise<any> {
+    return this.afDB.object("arbeitszeiten/" + date + "/workTimeEnd").set(endWorkTime);
+  }
+
+  getEndWorkTime(date: string): FirebaseObjectObservable<any> {
+    return this.afDB.object("arbeitszeiten/" + date + "/workTimeEnd");
   }
 
   getWorkingHours(): FirebaseObjectObservable<any> {
@@ -72,18 +78,16 @@ export class FirebaseService {
     this.afDB.object("arbeitszeitkonto").set(workingHours);
   }
 
-  getAllWorkTimes(): FirebaseListObservable<WorkTime[]> {
+  getAllWorkTimes(): FirebaseListObservable<any> {
     return this.afDB.list("arbeitszeiten", {
       query: {
-        orderByKey: true,
-      }
+        orderByChild: 'ReverseOrderDate',
+      },
+      preserveSnapshot: true
     });
   }
 
-  getDBDateString(): string {
-    let todayDate = new Date().toISOString();
-    let endIndex = todayDate.indexOf("T");
-    return todayDate.slice(0, endIndex);
+  deleteWorkTime(dateKey: string) {
+    this.afDB.object("arbeitszeiten/" + dateKey).remove();
   }
-
 }
