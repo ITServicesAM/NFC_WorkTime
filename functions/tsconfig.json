@@ -4,9 +4,9 @@
     "module": "commonjs"
   },
   "include": [
-    "functions/**/*.ts"
+    "**/*.ts"
   ],
   "exclude": [
-    "functions/node_modules"
+    "node_modules"
   ]
 }

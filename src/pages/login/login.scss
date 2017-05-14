@@ -4,6 +4,15 @@ page-login {
     padding: 0 !important;
   }
 
+  ion-grid {
+    height: 100%;
+  }
+
+  ion-row {
+    height: 100%;
+    align-items: center;
+  }
+
   .auth_img {
     width: 50% !important;
     display: inline-block;

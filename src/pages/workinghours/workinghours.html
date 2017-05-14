@@ -5,7 +5,7 @@
       <button ion-button icon-only (click)="addWorkTimeManually()">
         <ion-icon name="add"></ion-icon>
       </button>
-      <button ion-button icon-only (click)="signOut()">
+      <button margin ion-button icon-only (click)="signOut()">
         <ion-icon name="log-out"></ion-icon>
       </button>
     </ion-buttons>
@@ -16,26 +16,32 @@
 
   <div class="vertical-align-content">
 
-    <ion-grid text-center>
+    <ion-grid>
       <ion-row>
         <ion-col></ion-col>
         <ion-col col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4>
           <ion-card>
-            <ion-card-content>
+            <ion-card-content text-center>
               <!-- Add card content here! -->
               <ion-card-title>
                 Datum: {{todayDate}}
               </ion-card-title>
-              <div
-                [@fadeIn]>
-                Kommtzeit: {{workTimeStart}} Uhr
-              </div>
-              <div
-                [@fadeIn]>Gehtzeit: {{workTimeEnd}} Uhr
-              </div>
-              <div
-                [@fadeIn]>
-                Heutige Arbeitszeit: {{(workTimeObservable | async)?.workingHours}}
+              <div text-left style="display: inline-block">
+                <div
+                  [@fadeIn]>
+                  Kommtzeit: {{workTimeStart}} Uhr
+                </div>
+                <div
+                  [@fadeIn]>Gehtzeit: {{workTimeEnd}} Uhr
+                </div>
+                <div
+                  [@fadeIn]>
+                  Pause: {{(workTimeObservable | async)?.workingMinutesPause}} Minuten
+                </div>
+                <div
+                  [@fadeIn]>
+                  Überstunden: {{(workTimeObservable | async)?.workingMinutesOverTime}} Minuten
+                </div>
               </div>
             </ion-card-content>
           </ion-card>
@@ -46,8 +52,7 @@
               <ion-card-title>
                 Arbeitszeitkonto
               </ion-card-title>
-              <h1>{{overallWorkingHours}}</h1>
-              <h3>Stunden</h3>
+              <h1>{{overallWorkingHours | overTime}}</h1>
             </ion-card-content>
             <button ion-button icon-left clear (click)="editWorkingHoursManually()">
               <ion-icon name="create"></ion-icon>

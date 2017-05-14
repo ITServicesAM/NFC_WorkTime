@@ -8,7 +8,7 @@ import {HelperService} from '../../providers/helper-service';
 import {WorkTime} from '../../models/worktime';
 import {fadeIn} from '../../animations/animations';
 import * as moment from 'moment';
-import {AddWorkTimeModal} from './add_work_time_modal';
+import {AddWorkTimeModal} from './addworktimemanually/add_work_time_modal';
 import {FirebaseObjectObservable} from 'angularfire2/database';
 import {Subscription} from 'rxjs/Subscription';
 

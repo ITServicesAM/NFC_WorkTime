@@ -20,7 +20,8 @@ import {HelperService} from "../providers/helper-service";
 import {GooglePlus} from "@ionic-native/google-plus";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {SuperTabsModule} from 'ionic2-super-tabs';
-import {AddWorkTimeModal} from '../pages/workinghours/add_work_time_modal';
+import {AddWorkTimeModal} from '../pages/workinghours/addworktimemanually/add_work_time_modal';
+import {OverTimePipe} from '../pipes/overTime';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyArPv8jzIq2Y8QzY3_RN_k7LS95_MZaNjw",
@@ -38,7 +39,8 @@ export const firebaseConfig = {
     WorkingHoursPage,
     TabsPage,
     LoginPage,
-    AddWorkTimeModal
+    AddWorkTimeModal,
+    OverTimePipe
   ],
   imports: [
     BrowserModule,

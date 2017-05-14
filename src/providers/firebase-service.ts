@@ -48,46 +48,45 @@ export class FirebaseService {
     this.afAuth.auth.signOut();
   }
 
-  saveStartWorkTime(date: string, startWorkTime: string): firebase.Promise<any> {
-    // console.log(moment(date).format());
-    this.afDB.object("arbeitszeiten/" + date + "/ReverseOrderDate").set((0 - moment(date).valueOf()));
-    return this.afDB.object("arbeitszeiten/" + date + "/workTimeStart").set(startWorkTime);
+  saveStartWorkTime(dateKey: string, startWorkTime: string): firebase.Promise<any> {
+    // console.log(moment(dateKey).format());
+    this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey + "/ReverseOrderDate").set((0 - moment(dateKey).valueOf()));
+    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey + "/workTimeStart").set(startWorkTime);
   }
 
   getWorkTime(dateKey: string) {
-    return this.afDB.object("arbeitszeiten/" + dateKey);
+    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey);
   }
 
   getStartWorkTime(date: string): FirebaseObjectObservable<any> {
-    return this.afDB.object("arbeitszeiten/" + date + "/workTimeStart");
+    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + date + "/workTimeStart");
   }
 
   saveEndWorkTime(date: string, endWorkTime: string): firebase.Promise<any> {
-    return this.afDB.object("arbeitszeiten/" + date + "/workTimeEnd").set(endWorkTime);
+    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + date + "/workTimeEnd").set(endWorkTime);
   }
 
   getEndWorkTime(date: string): FirebaseObjectObservable<any> {
-    return this.afDB.object("arbeitszeiten/" + date + "/workTimeEnd");
+    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + date + "/workTimeEnd");
   }
 
   getWorkingHours(): FirebaseObjectObservable<any> {
-    return this.afDB.object("arbeitszeitkonto");
+    return this.afDB.object("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget");
   }
 
   saveWorkingHours(workingHours: string) {
-    this.afDB.object("arbeitszeitkonto").set(workingHours);
+    this.afDB.object("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget").set(workingHours);
   }
 
   getAllWorkTimes(): FirebaseListObservable<any> {
-    return this.afDB.list("arbeitszeiten", {
+    return this.afDB.list("workTimes/" + this.afAuth.auth.currentUser.uid + "/", {
       query: {
         orderByChild: 'ReverseOrderDate',
-      },
-      preserveSnapshot: true
+      }
     });
   }
 
   deleteWorkTime(dateKey: string) {
-    this.afDB.object("arbeitszeiten/" + dateKey).remove();
+    this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey).remove();
   }
 }

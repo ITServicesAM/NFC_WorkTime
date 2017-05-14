@@ -4,6 +4,7 @@ import {WorkTime} from '../../models/worktime';
 import {moveInLeft} from '../../animations/animations';
 import {AlertController} from 'ionic-angular';
 import * as moment from'moment';
+import {FirebaseListObservable} from 'angularfire2/database';
 
 @Component({
   selector: 'page-about',
@@ -12,29 +13,21 @@ import * as moment from'moment';
 })
 export class WorkTimesPage {
 
-  workTimes: WorkTime[] = [];
+  // workTimes: WorkTime[] = [];
+  workTimesObservable: FirebaseListObservable<WorkTime[]>;
 
   constructor(private firebaseService: FirebaseService,
               private alertCtrl: AlertController) {
-  }
-
-  ionViewDidEnter() {
-    this.firebaseService.getAllWorkTimes()
-      .subscribe(snapShots => {
-        this.workTimes = [];
-        snapShots.forEach(snapShot => {
-          // console.log(snapShot.key);
-          // console.log(snapShot.val());
-          this.workTimes.push(new WorkTime(snapShot.val().Kommtzeit, snapShot.val().Gehtzeit));
-        });
-      });
+    this.workTimesObservable = this.firebaseService.getAllWorkTimes();
+    // console.log(this.workTimesObservable);
   }
 
   signOut() {
+    this.workTimesObservable = null;
     this.firebaseService.signOut();
   }
 
-  kommtZeitChanged($event, workTime) {
+  workTimeStartChanged($event) {
     let curDate = moment()
       .date($event.day)
       .hour($event.hour)
@@ -45,7 +38,7 @@ export class WorkTimesPage {
     this.firebaseService.saveStartWorkTime(curDate.format("YYYY-MM-DD"), curDate.format());
   }
 
-  gehtZeitChanged($event, workTime) {
+  workTimeEndChanged($event) {
     let curDate = moment()
       .date($event.day)
       .hour($event.hour)
@@ -54,38 +47,6 @@ export class WorkTimesPage {
       .second($event.second)
       .year($event.year);
     this.firebaseService.saveEndWorkTime(curDate.format("YYYY-MM-DD"), curDate.format());
-  }
-
-  editWorkTime(workTime: WorkTime) {
-    let prompt = this.alertCtrl.create({
-      title: 'Arbeitszeit bearbeiten',
-      inputs: [
-        {
-          name: 'kommtZeit',
-          placeholder: 'Kommtzeit',
-          value: workTime.getKommtzeit()
-        },
-        {
-          name: 'gehtZeit',
-          placeholder: 'Gehtzeit',
-          value: workTime.getGehtzeit()
-        },
-      ],
-      buttons: [
-        {
-          text: 'Abbrechen',
-        },
-        {
-          text: 'Speichern',
-          handler: data => {
-            // console.log('Saved clicked with data: ' + JSON.stringify(data));
-            // this.firebaseService.saveStartWorkTime(new Date(), new Date)
-            // this.firebaseService.saveWorkingHours(data.arbeitszeit);
-          }
-        }
-      ]
-    });
-    prompt.present();
   }
 
   deleteWorkTime(workTime: WorkTime) {
