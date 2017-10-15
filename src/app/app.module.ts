@@ -1,4 +1,4 @@
-import {ErrorHandler, NgModule} from "@angular/core";
+import {ErrorHandler, LOCALE_ID, NgModule} from "@angular/core";
 import {BrowserModule} from "@angular/platform-browser";
 import {IonicApp, IonicErrorHandler, IonicModule} from "ionic-angular";
 import {MyApp} from "./app.component";
@@ -20,8 +20,10 @@ import {HelperService} from "../providers/helper-service";
 import {GooglePlus} from "@ionic-native/google-plus";
 import {BrowserAnimationsModule} from '@angular/platform-browser/animations';
 import {SuperTabsModule} from 'ionic2-super-tabs';
-import {AddWorkTimeModal} from '../pages/workinghours/addworktimemanually/add_work_time_modal';
 import {OverTimePipe} from '../pipes/overTime';
+import {AngularFireOfflineModule} from 'angularfire2-offline';
+import {AddWorkTimePageModule} from '../pages/add-work-time/add-work-time.module';
+import {ExpandableComponentModule} from '../components/expandable/expandable.module';
 
 export const firebaseConfig = {
   apiKey: "AIzaSyArPv8jzIq2Y8QzY3_RN_k7LS95_MZaNjw",
@@ -39,17 +41,27 @@ export const firebaseConfig = {
     WorkingHoursPage,
     TabsPage,
     LoginPage,
-    AddWorkTimeModal,
     OverTimePipe
   ],
   imports: [
     BrowserModule,
     BrowserAnimationsModule,
-    IonicModule.forRoot(MyApp),
+    // IonicModule.forRoot(MyApp),
+    IonicModule.forRoot(MyApp, {
+      monthNames: ['Januar', 'Februar', 'März', 'April', 'Mai', 'Juni',
+        'Juli', 'August', 'September', 'Oktober', 'November', 'Dezember'],
+      monthShortNames: ['Jan', 'Feb', 'Mär', 'Apr', 'Mai', 'Jun',
+        'Jul', 'Aug', 'Sep', 'Okt', 'Nov', 'Dez'],
+      dayNames: ['Sonntag', 'Montag', 'Dienstag', 'Mittwoch', 'Donnerstag', 'Freitag', 'Samstag'],
+      dayShortNames: ['So', 'Mo', 'Di', 'Mi', 'Do', 'Fr', 'Sa']
+    }),
     SuperTabsModule.forRoot(),
     AngularFireModule.initializeApp(firebaseConfig),
+    AngularFireOfflineModule,
     AngularFireAuthModule,
-    AngularFireDatabaseModule
+    AngularFireDatabaseModule,
+    AddWorkTimePageModule,
+    ExpandableComponentModule
   ],
   bootstrap: [IonicApp],
   entryComponents: [
@@ -58,9 +70,9 @@ export const firebaseConfig = {
     WorkingHoursPage,
     TabsPage,
     LoginPage,
-    AddWorkTimeModal
   ],
   providers: [
+    {provide: LOCALE_ID, useValue: "de-DE"}, //replace "de-DE" with your locale
     StatusBar,
     SplashScreen,
     {provide: ErrorHandler, useClass: IonicErrorHandler},

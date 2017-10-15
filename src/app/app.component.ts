@@ -2,6 +2,7 @@ import {Component} from "@angular/core";
 import {Platform} from "ionic-angular";
 import {StatusBar} from "@ionic-native/status-bar";
 import {SplashScreen} from "@ionic-native/splash-screen";
+import * as firebase from 'firebase/app';
 
 import {TabsPage} from "../pages/tabs/tabs";
 import {FirebaseService} from "../providers/firebase-service";
@@ -14,20 +15,28 @@ export class MyApp {
   rootPage: any;
 
   constructor(private firebaseService: FirebaseService,
-              platform: Platform,
-              statusBar: StatusBar,
-              splashScreen: SplashScreen) {
+              private platform: Platform,
+              private statusBar: StatusBar,
+              private splashScreen: SplashScreen) {
     platform.ready().then(() => {
       // Okay, so the platform is ready and our plugins are available.
       // Here you can do any higher level native things you might need.
-      statusBar.styleDefault();
+      if (this.platform.is('android')) {
+        this.statusBar.backgroundColorByHexString("#34515e");
+      } else {
+        this.statusBar.styleDefault();
+      }
     });
 
-    this.firebaseService.isAuthenticated().subscribe(user => {
-      splashScreen.hide();
-      if (user === null) {
+    // if (this.platform.is('cordova'))
+    //   this.splashScreen.hide();
+
+    this.firebaseService.isAuthenticated().subscribe((user: firebase.User) => {
+      if (this.platform.is('cordova'))
+        this.splashScreen.hide();
+      if (user == null)
         this.rootPage = LoginPage;
-      } else {
+      else {
         this.rootPage = TabsPage;
       }
     });

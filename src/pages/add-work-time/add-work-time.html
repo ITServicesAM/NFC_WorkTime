@@ -1,0 +1,42 @@
+<ion-header>
+  <ion-navbar color="primary">
+    <ion-title>Arbeitszeit hinzufügen</ion-title>
+  </ion-navbar>
+</ion-header>
+
+<ion-content padding>
+  <ion-grid>
+    <ion-row>
+      <ion-col></ion-col>
+      <ion-col
+        no-margin
+        no-padding
+        col-12 col-lg-8 col-xl-8>
+        <ion-card>
+          <ion-item>
+            <ion-label>Datum:</ion-label>
+            <ion-datetime
+              displayFormat="DDDD, DD.MM.YYYY"
+              pickerFormat="DD MM YYYY"
+              [(ngModel)]="date"></ion-datetime>
+          </ion-item>
+
+          <ion-item>
+            <ion-label>Arbeitszeit Begin:</ion-label>
+            <ion-datetime displayFormat="HH:mm" [(ngModel)]="workTimeStart"></ion-datetime>
+          </ion-item>
+
+          <ion-item margin-bottom>
+            <ion-label>Arbeitszeit Ende:</ion-label>
+            <ion-datetime displayFormat="HH:mm" [(ngModel)]="workTimeEnd"></ion-datetime>
+          </ion-item>
+
+          <button no-margin full ion-button (click)="saveWorkTime()">
+            Speichern
+          </button>
+        </ion-card>
+      </ion-col>
+      <ion-col></ion-col>
+    </ion-row>
+  </ion-grid>
+</ion-content>

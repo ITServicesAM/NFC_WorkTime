@@ -2,9 +2,10 @@ import {Component} from '@angular/core';
 import {FirebaseService} from '../../providers/firebase-service';
 import {WorkTime} from '../../models/worktime';
 import {moveInLeft} from '../../animations/animations';
-import {AlertController} from 'ionic-angular';
-import * as moment from'moment';
-import {FirebaseListObservable} from 'angularfire2/database';
+import {AlertController, NavController} from 'ionic-angular';
+import * as moment from 'moment';
+import {AfoListObservable, AfoObjectObservable} from 'angularfire2-offline';
+import {AddWorkTimePage} from '../add-work-time/add-work-time';
 
 @Component({
   selector: 'page-about',
@@ -13,40 +14,38 @@ import {FirebaseListObservable} from 'angularfire2/database';
 })
 export class WorkTimesPage {
 
-  // workTimes: WorkTime[] = [];
-  workTimesObservable: FirebaseListObservable<WorkTime[]>;
+  workTimes$: AfoListObservable<WorkTime[]>;
+  workingHours$: AfoObjectObservable<any>;
 
   constructor(private firebaseService: FirebaseService,
-              private alertCtrl: AlertController) {
-    this.workTimesObservable = this.firebaseService.getAllWorkTimes();
-    // console.log(this.workTimesObservable);
+              private alertCtrl: AlertController,
+              private nav: NavController) {
+    this.workTimes$ = this.firebaseService.getAllWorkTimes();
+    this.workingHours$ = this.firebaseService.getWorkingHours();
   }
 
   signOut() {
-    this.workTimesObservable = null;
     this.firebaseService.signOut();
   }
 
-  workTimeStartChanged($event) {
-    let curDate = moment()
-      .date($event.day)
-      .hour($event.hour)
-      .minute($event.minute)
-      .month($event.month - 1)
-      .second($event.second)
-      .year($event.year);
-    this.firebaseService.saveStartWorkTime(curDate.format("YYYY-MM-DD"), curDate.format());
+  workTimeStartChanged($event, workTime: WorkTime) {
+    // console.log($event + " and " + JSON.stringify(workTime));
+    let curDate = moment(Math.abs(workTime.reverseOrderDate));
+    curDate.set('hour', $event.hour);
+    curDate.set('minute', $event.minute);
+    curDate.set('second', $event.second);
+    // console.log(curDate.format());
+    this.firebaseService.saveStartWorkTime(curDate);
   }
 
-  workTimeEndChanged($event) {
-    let curDate = moment()
-      .date($event.day)
-      .hour($event.hour)
-      .minute($event.minute)
-      .month($event.month - 1)
-      .second($event.second)
-      .year($event.year);
-    this.firebaseService.saveEndWorkTime(curDate.format("YYYY-MM-DD"), curDate.format());
+  workTimeEndChanged($event, workTime?: WorkTime) {
+    console.log($event);
+    let curDate = moment(Math.abs(workTime.reverseOrderDate));
+    curDate.set('hour', $event.hour);
+    curDate.set('minute', $event.minute);
+    curDate.set('second', $event.second);
+    console.log(`CurDate: ${curDate.format()}`);
+    this.firebaseService.saveEndWorkTime(curDate);
   }
 
   deleteWorkTime(workTime: WorkTime) {
@@ -69,4 +68,7 @@ export class WorkTimesPage {
     alert.present();
   }
 
+  addWorkTime() {
+    this.nav.push(AddWorkTimePage);
+  }
 }

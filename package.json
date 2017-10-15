@@ -1,86 +1,100 @@
 {
-    "name": "WorkTimeManager",
-    "version": "0.0.2",
-    "author": "Ionic Framework",
-    "homepage": "http://ionicframework.com/",
-    "private": true,
-    "scripts": {
-        "clean": "ionic-app-scripts clean",
-        "build": "ionic-app-scripts build --prod",
-        "ionic:build": "ionic-app-scripts build",
-        "ionic:serve": "ionic-app-scripts serve"
+  "name": "WorkTimeManager",
+  "version": "0.0.2",
+  "author": "Ionic Framework",
+  "homepage": "http://ionicframework.com/",
+  "private": true,
+  "scripts": {
+    "clean": "ionic-app-scripts clean",
+    "build_prod": "npm run clean && ionic-app-scripts build --prod",
+    "build_prod-android": "npm run ionic-app-scripts build android --prod --release --aot --buildConfig=build.json"
+  },
+  "dependencies": {
+    "@angular/animations": "^4.4.3",
+    "@angular/common": "^4.4.3",
+    "@angular/compiler": "^4.4.3",
+    "@angular/compiler-cli": "^4.4.3",
+    "@angular/core": "^4.4.3",
+    "@angular/forms": "^4.4.3",
+    "@angular/http": "^4.4.3",
+    "@angular/platform-browser": "^4.4.3",
+    "@angular/platform-browser-dynamic": "^4.4.3",
+    "@ionic-native/core": "3.6.0",
+    "@ionic-native/google-plus": "^3.6.1",
+    "@ionic-native/nfc": "^3.6.1",
+    "@ionic-native/splash-screen": "3.4.2",
+    "@ionic-native/status-bar": "3.4.2",
+    "@ionic-native/vibration": "^3.6.1",
+    "@ionic/app-scripts": "^3.0.0",
+    "@ionic/storage": "2.0.1",
+    "angularfire2": "^4.0.0-rc0",
+    "angularfire2-offline": "^4.3.1",
+    "cordova-android": "^6.2.3",
+    "cordova-browser": "^4.1.0",
+    "cordova-ios": "^4.4.0",
+    "cordova-plugin-add-swift-support": "^1.6.0",
+    "cordova-plugin-compat": "^1.0.0",
+    "cordova-plugin-console": "^1.0.5",
+    "cordova-plugin-device": "^1.1.4",
+    "cordova-plugin-geofence": "^0.7.0",
+    "cordova-plugin-googleplus": "^5.1.1",
+    "cordova-plugin-splashscreen": "^4.0.3",
+    "cordova-plugin-statusbar": "^2.2.1",
+    "cordova-plugin-vibration": "^2.1.5",
+    "cordova-plugin-whitelist": "^1.3.1",
+    "es6-promise-plugin": "^4.1.1",
+    "firebase": "^3.9.0",
+    "install": "^0.10.1",
+    "intl": "^1.2.5",
+    "ionic-angular": "^3.7.0",
+    "ionic-plugin-keyboard": "^2.2.1",
+    "ionic2-super-tabs": "2.6.2",
+    "ionicons": "3.0.0",
+    "leaflet": "^1.2.0",
+    "moment": "^2.18.1",
+    "npm": "^5.4.2",
+    "phonegap-nfc": "^0.6.6",
+    "rxjs": "^5.4.3",
+    "sw-toolbox": "3.4.0",
+    "zone.js": "^0.8.17"
+  },
+  "devDependencies": {
+    "@ionic/app-scripts": "1.3.7",
+    "ionic": "3.12.0",
+    "typescript": "~2.2.1"
+  },
+  "cordovaPlugins": [
+    "cordova-plugin-whitelist",
+    "cordova-plugin-console",
+    "cordova-plugin-statusbar",
+    "cordova-plugin-device",
+    "cordova-plugin-splashscreen",
+    "ionic-plugin-keyboard"
+  ],
+  "cordovaPlatforms": [],
+  "description": "NFC_WorkTimes: An Ionic project",
+  "cordova": {
+    "plugins": {
+      "cordova-plugin-console": {},
+      "cordova-plugin-device": {},
+      "cordova-plugin-splashscreen": {},
+      "cordova-plugin-statusbar": {},
+      "cordova-plugin-whitelist": {},
+      "ionic-plugin-keyboard": {},
+      "phonegap-nfc": {},
+      "cordova-plugin-vibration": {},
+      "cordova-plugin-googleplus": {
+        "REVERSED_CLIENT_ID": "com.googleusercontent.apps.8111052943-tji3bvigjf82gche8vvq7i8hga35oa5t"
+      },
+      "cordova-plugin-geofence": {
+        "GEOFENCE_ALWAYS_USAGE_DESCRIPTION": "${EXECUTABLE_NAME} Would Like to Use Your Current Location Even In Background.",
+        "GEOFENCE_IN_USE_USAGE_DESCRIPTION": "${EXECUTABLE_NAME} Would Like to Use Your Current Location When In Use."
+      }
     },
-    "dependencies": {
-        "@angular/animations": "4.0.2",
-        "@angular/common": "4.0.2",
-        "@angular/compiler": "4.0.2",
-        "@angular/compiler-cli": "4.0.2",
-        "@angular/core": "4.0.2",
-        "@angular/forms": "4.0.2",
-        "@angular/http": "4.0.2",
-        "@angular/platform-browser": "4.0.2",
-        "@angular/platform-browser-dynamic": "4.0.2",
-        "@ionic-native/core": "3.6.0",
-        "@ionic-native/google-plus": "^3.6.1",
-        "@ionic-native/nfc": "^3.6.1",
-        "@ionic-native/splash-screen": "3.4.2",
-        "@ionic-native/status-bar": "3.4.2",
-        "@ionic-native/vibration": "^3.6.1",
-        "@ionic/storage": "2.0.1",
-        "angularfire2": "^4.0.0-rc0",
-        "cordova-android": "^6.2.3",
-        "cordova-browser": "^4.1.0",
-        "cordova-plugin-console": "^1.0.5",
-        "cordova-plugin-device": "^1.1.4",
-        "cordova-plugin-googleplus": "^5.1.1",
-        "cordova-plugin-splashscreen": "^4.0.3",
-        "cordova-plugin-statusbar": "^2.2.1",
-        "cordova-plugin-vibration": "^2.1.5",
-        "cordova-plugin-whitelist": "^1.3.1",
-        "firebase": "^3.9.0",
-        "intl": "^1.2.5",
-        "ionic-angular": "3.1.1",
-        "ionic-plugin-keyboard": "^2.2.1",
-        "ionic2-super-tabs": "^2.5.2",
-        "ionicons": "3.0.0",
-        "moment": "^2.18.1",
-        "phonegap-nfc": "^0.6.6",
-        "rxjs": "5.1.1",
-        "sw-toolbox": "3.4.0",
-        "zone.js": "^0.8.10"
-    },
-    "devDependencies": {
-        "@ionic/app-scripts": "1.3.7",
-        "@ionic/cli-plugin-ionic-angular": "1.0.0",
-        "typescript": "~2.2.1"
-    },
-    "cordovaPlugins": [
-        "cordova-plugin-whitelist",
-        "cordova-plugin-console",
-        "cordova-plugin-statusbar",
-        "cordova-plugin-device",
-        "cordova-plugin-splashscreen",
-        "ionic-plugin-keyboard"
-    ],
-    "cordovaPlatforms": [],
-    "description": "NFC_WorkTimes: An Ionic project",
-    "cordova": {
-        "plugins": {
-            "cordova-plugin-console": {},
-            "cordova-plugin-device": {},
-            "cordova-plugin-splashscreen": {},
-            "cordova-plugin-statusbar": {},
-            "cordova-plugin-whitelist": {},
-            "ionic-plugin-keyboard": {},
-            "phonegap-nfc": {},
-            "cordova-plugin-vibration": {},
-            "cordova-plugin-googleplus": {
-                "REVERSED_CLIENT_ID": "com.googleusercontent.apps.8111052943-tji3bvigjf82gche8vvq7i8hga35oa5t"
-            }
-        },
-        "platforms": [
-            "android",
-            "browser"
-        ]
-    }
+    "platforms": [
+      "android",
+      "browser",
+      "ios"
+    ]
+  }
 }

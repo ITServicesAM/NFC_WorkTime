@@ -1,13 +1,20 @@
 {
-  "name": "Ionic",
-  "short_name": "Ionic",
+  "name": "WorkTime",
+  "short_name": "WorkTime",
   "start_url": "index.html",
   "display": "standalone",
-  "icons": [{
-    "src": "assets/imgs/logo.png",
-    "sizes": "512x512",
-    "type": "image/png"
-  }],
-  "background_color": "#4e8ef7",
-  "theme_color": "#4e8ef7"
+  "icons": [
+    {
+      "src": "assets/icon/favicon.ico",
+      "sizes": "225x225",
+      "type": "image/png"
+    },
+    {
+      "src": "assets/icon/favicon.ico",
+      "sizes": "144x144",
+      "type": "image/png"
+    }
+  ],
+  "background_color": "#607D8B",
+  "theme_color": "#607D8B"
 }

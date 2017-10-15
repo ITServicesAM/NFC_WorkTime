@@ -1,0 +1,14 @@
+<ion-card>
+  <ion-card-header>
+    <button ion-item detail-none (click)="toggleExpanded()" class="header_button">
+      {{title}}
+      <ion-icon item-right color="primary" [name]="iconName"></ion-icon>
+    </button>
+  </ion-card-header>
+  <ion-card-content #expandWrapper class='expand-wrapper' [class.collapsed]="!expanded">
+    <ng-content></ng-content>
+  </ion-card-content>
+</ion-card>
+
+
+

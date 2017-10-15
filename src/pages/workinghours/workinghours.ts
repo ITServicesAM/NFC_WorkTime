@@ -1,6 +1,6 @@
-import {Component, NgZone, OnDestroy} from '@angular/core';
+import {Component, NgZone} from '@angular/core';
 import {NFC} from '@ionic-native/nfc';
-import {AlertController, ModalController, Platform} from 'ionic-angular';
+import {AlertController, NavController, Platform} from 'ionic-angular';
 import {NdefTag, Tag, TagUtil} from '../../models/tag';
 import {Vibration} from '@ionic-native/vibration';
 import {FirebaseService} from '../../providers/firebase-service';
@@ -8,64 +8,44 @@ import {HelperService} from '../../providers/helper-service';
 import {WorkTime} from '../../models/worktime';
 import {fadeIn} from '../../animations/animations';
 import * as moment from 'moment';
-import {AddWorkTimeModal} from './addworktimemanually/add_work_time_modal';
-import {FirebaseObjectObservable} from 'angularfire2/database';
-import {Subscription} from 'rxjs/Subscription';
+import {AfoObjectObservable} from 'angularfire2-offline';
 
 @Component({
   selector: 'page-home',
   templateUrl: 'workinghours.html',
   animations: [fadeIn()]
 })
-export class WorkingHoursPage implements OnDestroy {
-  ngOnDestroy(): void {
-    this.workTimeObservableSubscription.unsubscribe();
-    this.workingHoursObservableSubscription.unsubscribe();
-  }
-
+export class WorkingHoursPage {
   tag: Tag = new Tag();
   todayDate: string;
-  workTimeObservable: FirebaseObjectObservable<WorkTime>;
-  workTimeObservableSubscription: Subscription;
-  workingHoursObservable: FirebaseObjectObservable<any>;
-  workingHoursObservableSubscription: Subscription;
+  workTime$: AfoObjectObservable<WorkTime>;
+  workingHours$: AfoObjectObservable<any>;
   workTimeStart: string = " - ";
   workTimeEnd: string = " - ";
   overallWorkingHours: string;
   state: string = "";
 
-  constructor(private nfc: NFC,
+  constructor(private navCtrl: NavController,
+              private nfc: NFC,
               private platform: Platform,
               private zone: NgZone,
               private vibration: Vibration,
               private firebaseService: FirebaseService,
               private helper: HelperService,
-              private alertCtrl: AlertController,
-              private modalCtrl: ModalController) {
+              private alertCtrl: AlertController) {
     platform.ready().then(() => {
       if (platform.is('cordova'))
         this.addNfcListeners();
     });
-
     this.init();
   }
 
-  ionViewDidEnter() {
-  }
-
   init() {
-    this.todayDate = moment().format("DD.MM.YYYY");
+    moment.locale('de-DE');
+    this.todayDate = moment().format("ddd, DD.MM.YYYY");
 
-    this.workTimeObservable = this.firebaseService.getWorkTime(moment().format("YYYY-MM-DD"));
-    this.workTimeObservableSubscription = this.workTimeObservable.subscribe((data: WorkTime) => {
-      this.workTimeStart = data.workTimeStart ? moment(data.workTimeStart).format("HH:mm:ss") : " - ";
-      this.workTimeEnd = data.workTimeEnd ? moment(data.workTimeEnd).format("HH:mm:ss") : " - ";
-    });
-
-    this.workingHoursObservable = this.firebaseService.getWorkingHours();
-    this.workingHoursObservableSubscription = this.workingHoursObservable.subscribe(data => {
-      this.overallWorkingHours = data.$value;
-    });
+    this.workTime$ = this.firebaseService.getWorkTime(moment().format("YYYY-MM-DD"));
+    this.workingHours$ = this.firebaseService.getWorkingHours();
   }
 
   addNfcListeners(): void {
@@ -132,12 +112,12 @@ export class WorkingHoursPage implements OnDestroy {
   }
 
   private saveStartWorkTime() {
-    this.firebaseService.saveStartWorkTime(moment().format("YYYY-MM-DD"), moment().format());
+    this.firebaseService.saveStartWorkTime(moment());
     this.helper.showToast("Neue Kommtzeit erfasst", 3000);
   }
 
   private saveEndWorkTime() {
-    this.firebaseService.saveEndWorkTime(moment().format("YYYY-MM-DD"), moment().format());
+    this.firebaseService.saveEndWorkTime(moment());
     this.helper.showToast("Neue Gehtzeit erfasst", 3000);
   }
 
@@ -145,35 +125,38 @@ export class WorkingHoursPage implements OnDestroy {
     this.firebaseService.signOut();
   }
 
+  openMap() {
+    // this.navCtrl.push(AddWorkingLocationPage);
+  }
+
   editWorkingHoursManually() {
-    let prompt = this.alertCtrl.create({
-      title: "Neuen Wert für das Arbeitszeitkonto setzen",
-      inputs: [
-        {
-          name: 'arbeitszeit',
-          placeholder: 'Arbeitszeit',
-          value: this.overallWorkingHours
-        },
-      ],
-      buttons: [
-        {
-          text: 'Abbrechen',
-        },
-        {
-          text: 'Speichern',
-          handler: data => {
-            // console.log('Saved clicked with data: ' + JSON.stringify(data));
-            this.firebaseService.saveWorkingHours(data.arbeitszeit);
+    let workingHoursValue;
+    this.workingHours$.take(1).subscribe(value => {
+      // console.log(value);
+      workingHoursValue = value.$value;
+      let prompt = this.alertCtrl.create({
+        title: "Neuen Wert für das Arbeitszeitkonto setzen",
+        inputs: [
+          {
+            name: 'arbeitszeit',
+            placeholder: 'Arbeitszeit',
+            value: workingHoursValue
+          },
+        ],
+        buttons: [
+          {
+            text: 'Abbrechen',
+          },
+          {
+            text: 'Speichern',
+            handler: data => {
+              // console.log('Saved clicked with data: ' + JSON.stringify(data));
+              this.firebaseService.saveWorkingHours(Number(data.arbeitszeit));
+            }
           }
-        }
-      ]
+        ]
+      });
+      prompt.present();
     });
-    prompt.present();
   }
-
-  addWorkTimeManually() {
-    this.modalCtrl.create(AddWorkTimeModal).present();
-  }
-
-
 }

@@ -1,29 +1,28 @@
 import {Injectable} from '@angular/core';
 import 'rxjs/add/operator/map';
+import 'rxjs/add/operator/take';
 import {AngularFireAuth} from 'angularfire2/auth';
-import {AngularFireDatabase, FirebaseListObservable, FirebaseObjectObservable} from 'angularfire2/database';
 import * as firebase from 'firebase/app';
-import {Observable} from 'rxjs/Observable';
 import {Platform} from 'ionic-angular';
 import {GooglePlus} from '@ionic-native/google-plus';
 import {HelperService} from './helper-service';
-import * as moment from'moment';
+import * as moment from 'moment';
+import {Moment} from 'moment';
+import {AfoListObservable, AfoObjectObservable, AngularFireOfflineDatabase} from 'angularfire2-offline';
+import {Observable} from 'rxjs/Observable';
 
 @Injectable()
 export class FirebaseService {
 
-  private authState: Observable<firebase.User>;
-
   constructor(private afAuth: AngularFireAuth,
-              private afDB: AngularFireDatabase,
+              private afOfDB: AngularFireOfflineDatabase,
               private platform: Platform,
               private google: GooglePlus,
               private helper: HelperService) {
-    this.authState = afAuth.authState;
   }
 
   isAuthenticated(): Observable<firebase.User> {
-    return this.authState;
+    return this.afAuth.authState;
   }
 
   signInWithGoogle(): void {
@@ -48,45 +47,142 @@ export class FirebaseService {
     this.afAuth.auth.signOut();
   }
 
-  saveStartWorkTime(dateKey: string, startWorkTime: string): firebase.Promise<any> {
+  saveStartWorkTime(dateObj: Moment): firebase.Promise<any> {
+    let dateKey: string = dateObj.format("YYYY-MM-DD");
+    let workTimeStart: string = dateObj.format();
+
     // console.log(moment(dateKey).format());
-    this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey + "/ReverseOrderDate").set((0 - moment(dateKey).valueOf()));
-    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey + "/workTimeStart").set(startWorkTime);
+    let updates = {};
+    updates[`/reverseOrderDate`] = (0 - moment(dateKey).valueOf());
+    updates[`/date`] = dateKey;
+    updates[`/workTimeStart`] = workTimeStart;
+
+    return this.afOfDB.object(`workTimes/${this.afAuth.auth.currentUser.uid}/${dateKey}`).update(updates)
+      .then(() => {
+        this.calculateOverTimeBudget(dateKey);
+      });
   }
 
   getWorkTime(dateKey: string) {
-    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey);
+    return this.afOfDB.object(`workTimes/${this.afAuth.auth.currentUser.uid}/${dateKey}`);
   }
 
-  getStartWorkTime(date: string): FirebaseObjectObservable<any> {
-    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + date + "/workTimeStart");
+  saveEndWorkTime(dateObj: Moment): firebase.Promise<any> {
+    let dateKey: string = dateObj.format("YYYY-MM-DD");
+    let workTimeEnd: string = dateObj.format();
+
+    // console.log(moment(dateKey).format());
+    let updates = {};
+    updates[`/date`] = dateKey;
+    updates[`/workTimeEnd`] = workTimeEnd;
+
+    return this.afOfDB.object(`workTimes/${this.afAuth.auth.currentUser.uid}/${dateKey}`).update(updates)
+      .then(() => {
+        this.calculateOverTimeBudget(dateKey);
+      });
   }
 
-  saveEndWorkTime(date: string, endWorkTime: string): firebase.Promise<any> {
-    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + date + "/workTimeEnd").set(endWorkTime);
+  saveWorkTime(dateKey: string, workTimeStart: string, workTimeEnd: string): firebase.Promise<any> {
+    let updates = {};
+    updates[`/reverseOrderDate`] = (0 - moment(dateKey).valueOf());
+    updates[`/date`] = dateKey;
+    updates[`/workTimeStart`] = workTimeStart;
+    updates[`/workTimeEnd`] = workTimeEnd;
+
+    return this.afOfDB.object(`workTimes/${this.afAuth.auth.currentUser.uid}/${dateKey}`).update(updates)
+      .then(() => {
+        this.calculateOverTimeBudget(dateKey);
+      });
   }
 
-  getEndWorkTime(date: string): FirebaseObjectObservable<any> {
-    return this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + date + "/workTimeEnd");
+  getWorkingHours(): AfoObjectObservable<any> {
+    return this.afOfDB.object("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget");
   }
 
-  getWorkingHours(): FirebaseObjectObservable<any> {
-    return this.afDB.object("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget");
+  saveWorkingHours(workingHours: number) {
+    this.afOfDB.object("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget").set(workingHours);
   }
 
-  saveWorkingHours(workingHours: string) {
-    this.afDB.object("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget").set(workingHours);
-  }
-
-  getAllWorkTimes(): FirebaseListObservable<any> {
-    return this.afDB.list("workTimes/" + this.afAuth.auth.currentUser.uid + "/", {
+  getAllWorkTimes(): AfoListObservable<any> {
+    return this.afOfDB.list("workTimes/" + this.afAuth.auth.currentUser.uid + "/", {
       query: {
-        orderByChild: 'ReverseOrderDate',
+        orderByChild: 'reverseOrderDate',
       }
     });
   }
 
-  deleteWorkTime(dateKey: string) {
-    this.afDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey).remove();
+  async deleteWorkTime(dateKey: string) {
+    let workingHoursObj = await firebase.database()
+      .ref("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey + "/workingMinutesOverTime").once('value');
+    let workingHours = workingHoursObj.val();
+    let overallWorkingHoursObj = await firebase.database()
+      .ref("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget").once('value');
+    let overallWorkingHours = overallWorkingHoursObj.val();
+
+    let newValue: number = overallWorkingHours - workingHours;
+
+    // console.log(workingHoursObj.val() + "  " + overallWorkingHoursObj.val() + "   " + newValue);
+    this.afOfDB.object("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget").set(newValue);
+    this.afOfDB.object("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey).remove();
+  }
+
+  async calculateOverTimeBudget(dateKey: string) {
+    let workTimeObj = await firebase.database().ref("workTimes/" + this.afAuth.auth.currentUser.uid + "/" + dateKey).once('value');
+    let workTimeStart = workTimeObj.val().workTimeStart;
+    let workTimeEnd = workTimeObj.val().workTimeEnd;
+
+    if (workTimeStart && workTimeEnd) {
+      let workingMinutesOverTimeOld: number = workTimeObj.val().workingMinutesOverTime;
+      let milliseconds = moment(workTimeEnd).valueOf() - moment(workTimeStart).valueOf();
+
+      if (milliseconds > 0) {
+        //get minutes form milliseconds
+        let minutes = milliseconds / (1000 * 60);
+        let workingMinutesBrutto: number = Math.floor(minutes);
+        // console.log("all minutes in the duration: " + workingMinutesRaw);
+
+        let workingMinutesPause: number = 0;
+        if (Math.floor(workingMinutesBrutto / 60) < 6) {
+          // console.log("Keine Pause");
+        } else if (Math.floor(workingMinutesBrutto / 60) === 6 && (((workingMinutesBrutto / 60) - (Math.floor(workingMinutesBrutto / 60))) * 60) > 0) {
+          workingMinutesPause = 30;
+          // console.log("30 minuten Pause");
+        } else if (Math.floor(workingMinutesBrutto / 60) > 6 && Math.floor(workingMinutesBrutto / 60) < 9) {
+          workingMinutesPause = 30;
+          // console.log("30 minuten Pause");
+        } else if (Math.floor(workingMinutesBrutto / 60) === 9 && (((workingMinutesBrutto / 60) - (Math.floor(workingMinutesBrutto / 60))) * 60) > 0) {
+          workingMinutesPause = 45;
+          // console.log("45 minuten Pause");
+        } else if (Math.floor(workingMinutesBrutto / 60) > 9) {
+          workingMinutesPause = 45;
+          // console.log("45 minuten Pause");
+        }
+
+        let defaultWorkingMinutesPerDay: number = 480; //entspricht 8:30 Stunden
+        let workingMinutesNetto: number = workingMinutesBrutto - workingMinutesPause;
+        let workingMinutesOverTimeNew: number = workingMinutesNetto - defaultWorkingMinutesPerDay;
+
+        workTimeObj.ref.child("workingMinutesBrutto").set(workingMinutesBrutto);
+        workTimeObj.ref.child("workingMinutesPause").set(workingMinutesPause);
+        workTimeObj.ref.child("workingMinutesNetto").set(workingMinutesNetto);
+        workTimeObj.ref.child("workingMinutesOverTime").set(workingMinutesOverTimeNew);
+
+        //CALCULATE ADDITION OR SUBTRACTION TO WORKING_HOURS_BUDGET
+        let overTimeBudgetObj = await firebase.database().ref("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget").once('value');
+        let overTimeBudget: number = Number(overTimeBudgetObj.val()); //value in minutes
+
+        let newOverTimeBudget: number = 0;
+        if (!workingMinutesOverTimeOld) {
+          newOverTimeBudget = overTimeBudget + workingMinutesOverTimeNew;
+        } else {
+          let valueChange: number = workingMinutesOverTimeNew - workingMinutesOverTimeOld;
+          console.log("ValueChange: " + valueChange);
+          newOverTimeBudget = overTimeBudget + valueChange;
+        }
+
+        firebase.database().ref("overTimeBudgets/" + this.afAuth.auth.currentUser.uid + "/overTimeBudget").set(newOverTimeBudget);
+      }
+    }
+    // console.log("workTime: " + workTimeObj.val().workTimeEnd);
   }
 }

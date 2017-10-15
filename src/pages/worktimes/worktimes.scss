@@ -1,6 +1,35 @@
 page-about {
   button[fab].myfab {
-    top: calc(100% - 35px)!important;
+    top: calc(100% - 35px) !important;
     z-index: 50;
   }
+
+  .no_grow {
+    ion-col {
+      flex-grow: 0 !important;
+    }
+  }
+
+  .drop_shadow {
+    -webkit-box-shadow: 0 8px 6px -6px #999;
+    -moz-box-shadow: 0 8px 6px -6px #999;
+    box-shadow: 0 8px 6px -6px #999;
+  }
+
+  .margin_right_60 {
+    margin-right: 64px;
+  }
+
+  ion-datetime {
+    min-width: 96px;
+  }
+
+  .workTimeText {
+    font-size: 16px !important;
+  }
+
+  ion-grid {
+    margin-bottom: 70px;
+  }
 }
+

@@ -1,68 +1,84 @@
 <ion-header>
-  <ion-navbar>
+  <ion-navbar color="primary">
     <ion-title>
       Meine Arbeitszeiten
     </ion-title>
     <ion-buttons right>
-      <button margin ion-button icon-only (click)="signOut()">
+      <button ion-button icon-only (click)="signOut()">
         <ion-icon name="log-out"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
+  <ion-toolbar color="primary">
+    <ion-title>
+      Arbeitszeitkonto {{(workingHours$ | async)?.$value | overTime}}
+    </ion-title>
+  </ion-toolbar>
 </ion-header>
 
-<ion-content padding>
-
+<ion-content>
   <ion-grid>
     <ion-row>
       <ion-col></ion-col>
-      <ion-col col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4>
+      <ion-col col-12 col-lg-8 col-xl-8>
         <ion-list>
-          <ion-card
-            *ngFor="let workTime of workTimesObservable | async">
-
-            <ion-card-content>
-              <!-- Add card content here! -->
-              <div style="position: relative">
-                <ion-fab right top>
-                  <button ion-fab class="myfab" (click)="deleteWorkTime(workTime)">
-                    <ion-icon name="trash"></ion-icon>
-                  </button>
-                </ion-fab>
-              </div>
-
-              <ion-card-title>
-                Datum: {{workTime.workTimeStart | date:'dd.MM.yyyy'}}
-              </ion-card-title>
-
-              <ion-item>
-                <span item-left>Kommtzeit: </span>
+          <expandable
+            [expandHeight]="200"
+            *ngFor="let workTime of workTimes$ | async"
+            [title]="workTime.date | date:'EEE, dd.MM.yyyy'"
+            margin-bottom>
+            <ion-row class="no_grow" justify-content-start align-items-center>
+              <ion-col no-margin no-padding>
+                <ion-label class="workTimeText">Kommtzeit:</ion-label>
+              </ion-col>
+              <ion-col no-margin no-padding>
                 <ion-datetime
-                  (ionChange)="workTimeStartChanged($event)"
+                  class="workTimeText"
+                  (ionChange)="workTimeStartChanged($event, workTime)"
                   displayFormat="HH:mm:ss"
                   pickerFormat="HH:mm:ss"
-                  [ngModel]="workTime.workTimeStart"></ion-datetime>
-              </ion-item>
+                  [(ngModel)]="workTime.workTimeStart"></ion-datetime>
+              </ion-col>
+              <ion-col no-margin no-padding>
+                <div class="workTimeText">{{workTime.workTimeStart? " Uhr":" - "}}</div>
+              </ion-col>
+            </ion-row>
 
-              <ion-item>
-                <span item-left>Gehtzeit: </span>
+            <ion-row class="no_grow" justify-content-start align-items-center>
+              <ion-col no-margin no-padding>
+                <ion-label class="workTimeText">Gehtzeit:</ion-label>
+              </ion-col>
+              <ion-col no-margin no-padding>
                 <ion-datetime
-                  (ionChange)="workTimeEndChanged($event)"
+                  class="workTimeText"
+                  (ionChange)="workTimeEndChanged($event, workTime)"
                   displayFormat="HH:mm:ss"
                   pickerFormat="HH:mm:ss"
-                  [ngModel]="workTime.workTimeEnd"></ion-datetime>
-                <span> Uhr</span>
-              </ion-item>
-
-              <ion-item>
-                Überstunden: {{workTime.workingMinutesOverTime}} Minuten
-              </ion-item>
-            </ion-card-content>
-          </ion-card>
+                  [(ngModel)]="workTime.workTimeEnd"></ion-datetime>
+              </ion-col>
+              <ion-col>
+                <div class="workTimeText">{{workTime.workTimeEnd? " Uhr":""}}</div>
+              </ion-col>
+            </ion-row>
+            <ion-item no-padding>
+              <div class="workTimeText">Überstunden: {{workTime.workingMinutesOverTime? workTime.workingMinutesOverTime : '-'}} Minuten</div>
+            </ion-item>
+            <ion-row text-center>
+              <button (click)="deleteWorkTime(workTime)" ion-button icon-left block outline>
+                <div>Löschen</div>
+              </button>
+            </ion-row>
+          </expandable>
         </ion-list>
       </ion-col>
       <ion-col></ion-col>
     </ion-row>
   </ion-grid>
+
+  <ion-fab right bottom margin>
+    <button ion-fab color="secondary" (click)="addWorkTime()">
+      <ion-icon name="add"></ion-icon>
+    </button>
+  </ion-fab>
 
 </ion-content>

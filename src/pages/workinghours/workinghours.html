@@ -1,48 +1,45 @@
 <ion-header>
-  <ion-navbar>
+  <ion-navbar color="primary">
     <ion-title>Mein Arbeitszeitkonto</ion-title>
     <ion-buttons right>
-      <button ion-button icon-only (click)="addWorkTimeManually()">
-        <ion-icon name="add"></ion-icon>
-      </button>
-      <button margin ion-button icon-only (click)="signOut()">
+      <button ion-button icon-only (click)="signOut()">
         <ion-icon name="log-out"></ion-icon>
+      </button>
+      <button ion-button icon-only (click)="openMap()">
+        <ion-icon name="add"></ion-icon>
       </button>
     </ion-buttons>
   </ion-navbar>
 </ion-header>
 
 <ion-content full-screen padding>
-
   <div class="vertical-align-content">
-
     <ion-grid>
       <ion-row>
         <ion-col></ion-col>
         <ion-col col-12 col-sm-10 col-md-8 col-lg-6 col-xl-4>
           <ion-card>
-            <ion-card-content text-center>
+            <ion-card-header>
+              Datum: {{todayDate}}
+            </ion-card-header>
+
+            <ion-card-content>
               <!-- Add card content here! -->
-              <ion-card-title>
-                Datum: {{todayDate}}
-              </ion-card-title>
-              <div text-left style="display: inline-block">
-                <div
-                  [@fadeIn]>
-                  Kommtzeit: {{workTimeStart}} Uhr
-                </div>
-                <div
-                  [@fadeIn]>Gehtzeit: {{workTimeEnd}} Uhr
-                </div>
-                <div
-                  [@fadeIn]>
-                  Pause: {{(workTimeObservable | async)?.workingMinutesPause}} Minuten
-                </div>
-                <div
-                  [@fadeIn]>
-                  Überstunden: {{(workTimeObservable | async)?.workingMinutesOverTime}} Minuten
-                </div>
-              </div>
+              <button (click)="saveStartWorkTime()" clear ion-button icon-left>
+                <ion-icon name="time"></ion-icon>
+                Kommtzeit: {{(workTime$ | async)?.workTimeStart ? ((workTime$ | async)?.workTimeStart | date:'HH:mm:ss') : ' - '}} Uhr
+              </button>
+              <button (click)="saveEndWorkTime()" clear ion-button icon-left>
+                <ion-icon name="time"></ion-icon>
+                Gehtzeit: {{(workTime$ | async)?.workTimeEnd ? ((workTime$ | async)?.workTimeEnd | date:'HH:mm:ss') : ' - '}} Uhr
+              </button>
+              <ion-item [@fadeIn]>
+                Pause: {{(workTime$ | async)?.workingMinutesPause}} Minuten
+              </ion-item>
+              <ion-item [@fadeIn]>
+                Überstunden: {{(workTime$ | async)?.workingMinutesOverTime}} Minuten
+              </ion-item>
+              <!--</div>-->
             </ion-card-content>
           </ion-card>
 
@@ -52,7 +49,7 @@
               <ion-card-title>
                 Arbeitszeitkonto
               </ion-card-title>
-              <h1>{{overallWorkingHours | overTime}}</h1>
+              <h1>{{(workingHours$ | async)?.$value | overTime}}</h1>
             </ion-card-content>
             <button ion-button icon-left clear (click)="editWorkingHoursManually()">
               <ion-icon name="create"></ion-icon>
